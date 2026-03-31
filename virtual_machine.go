@@ -49,6 +49,13 @@ func (v *VirtualMachine) Config(ctx context.Context, options ...VirtualMachineOp
 	return NewTask(upid, v.client), err
 }
 
+func (v *VirtualMachine) Monitor(ctx context.Context, command string) (s string, err error) {
+	data := make(map[string]interface{})
+	data["command"] = command
+	err = v.client.Post(ctx, fmt.Sprintf("/nodes/%s/qemu/%d/monitor", v.Node, v.VMID), data, &s)
+	return s, err
+}
+
 func (v *VirtualMachine) TermProxy(ctx context.Context) (term *Term, err error) {
 	return term, v.client.Post(ctx, fmt.Sprintf("/nodes/%s/qemu/%d/termproxy", v.Node, v.VMID), nil, &term)
 }
