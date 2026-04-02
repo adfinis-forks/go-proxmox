@@ -39,6 +39,8 @@ func (v *VirtualMachine) Ping(ctx context.Context) error {
 	if err := v.client.Get(ctx, fmt.Sprintf("/nodes/%s/qemu/%d/status/current", v.Node, v.VMID), &v); err != nil {
 		return err
 	}
+	// New, empty config in case something was deleted
+	v.VirtualMachineConfig = &VirtualMachineConfig{}
 	return v.client.Get(ctx, fmt.Sprintf("/nodes/%s/qemu/%d/config", v.Node, v.VMID), &v.VirtualMachineConfig)
 }
 
