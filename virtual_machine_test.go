@@ -369,6 +369,21 @@ func TestVirtualMachine_NewSnapshot(t *testing.T) {
 	assert.Equal(t, "100", task.ID)
 }
 
+func TestVirtualMachine_DeleteSnapshot(t *testing.T) {
+	mocks.On(mockConfig)
+	defer mocks.Off()
+	client := mockClient()
+	ctx := context.Background()
+	vm := VirtualMachine{
+		client: client,
+		Node:   "node1",
+		VMID:   100,
+	}
+	task, err := vm.DeleteSnapshot(ctx, "snap2")
+	assert.Nil(t, err)
+	assert.NotEmpty(t, task)
+}
+
 func TestVirtualMachine_SnapshotRollback(t *testing.T) {
 	mocks.On(mockConfig)
 	defer mocks.Off()
