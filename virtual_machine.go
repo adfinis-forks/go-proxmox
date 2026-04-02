@@ -36,7 +36,10 @@ func (v *VirtualMachine) New(c *Client, nodeName string, vmid int) {
 }
 
 func (v *VirtualMachine) Ping(ctx context.Context) error {
-	return v.client.Get(ctx, fmt.Sprintf("/nodes/%s/qemu/%d/status/current", v.Node, v.VMID), &v)
+	if err := v.client.Get(ctx, fmt.Sprintf("/nodes/%s/qemu/%d/status/current", v.Node, v.VMID), &v); err != nil {
+		return err
+	}
+	return v.client.Get(ctx, fmt.Sprintf("/nodes/%s/qemu/%d/config", v.Node, v.VMID), &v.VirtualMachineConfig)
 }
 
 func (v *VirtualMachine) Config(ctx context.Context, options ...VirtualMachineOption) (*Task, error) {
