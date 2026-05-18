@@ -156,7 +156,6 @@ func TestVirtualMachineStateWithoutQMPStatus(t *testing.T) {
 	assert.False(t, hibernatedVM.IsRunning())
 }
 
-
 func TestVirtualMachine_Config(t *testing.T) {
 	mocks.On(mockConfig)
 	defer mocks.Off()
@@ -401,4 +400,23 @@ func TestVirtualMachine_SnapshotRollback(t *testing.T) {
 	assert.Equal(t, "node1", task.Node)
 	assert.Equal(t, "qmrollback", task.Type)
 	assert.Equal(t, "100", task.ID)
+}
+
+func TestVirtualMachine_AgentFileRead(t *testing.T) {
+	mocks.On(mockConfig)
+	defer mocks.Off()
+	client := mockClient()
+	ctx := context.Background()
+	vm := VirtualMachine{
+		client: client,
+		VMID:   100,
+		Node:   "node1",
+	}
+
+	result, err := vm.AgentFileRead(ctx, "testFile")
+	//result, err := vm.AgentFileRead(ctx, "testFile", 16777216, 0, true)
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, "Mock File Content", result.Content)
+	assert.Equal(t, false, result.Truncated)
 }

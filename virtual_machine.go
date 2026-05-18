@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -559,6 +560,47 @@ func (v *VirtualMachine) AgentExecStatus(ctx context.Context, pid int) (status *
 	}
 
 	return
+}
+
+// Once Pve9.2 is out!
+// func (v *VirtualMachine) AgentFileRead(ctx context.Context, file string, count, offset int, decode bool) (*AgentFileRead, error) {
+func (v *VirtualMachine) AgentFileRead(ctx context.Context, file string, count, offset int) (*AgentFileRead, error) {
+	//var t tmpAgentFileRead
+	var out AgentFileRead
+	var err error
+	// Path is a free-form filesystem path, so url-encode it.
+	q := url.Values{}
+	q.Set("file", file)
+	// golang json unmarshalling does automatic base64decoding into []byte
+	q.Set("decode", "0")
+
+	if count > 0 {
+		q.Set("count", strconv.Itoa(count))
+	}
+	if offset > 0 {
+		q.Set("offset", strconv.Itoa(offset))
+	}
+
+	if err := v.client.Get(ctx, fmt.Sprintf("/nodes/%s/qemu/%d/agent/file-read?%s", v.Node, v.VMID, q.Encode()), &out); err != nil {
+		return nil, err
+	}
+	//out.Content, err = base64.StdEncoding.DecodeString(t.Content)
+	return &out, err
+}
+
+func (v *VirtualMachine) AgentFileWrite(ctx context.Context, path string, content []byte) (err error) {
+	//p := &strings.Builder{}
+	//enc := base64.NewEncoder(base64.URLEncoding, p)
+	//if _, err := enc.Write(content); err != nil {
+	//	return err
+	//}
+	return v.client.Post(ctx, fmt.Sprintf("/nodes/%s/qemu/%d/agent/file-write", v.Node, v.VMID),
+		map[string]any{
+			"file":    path,
+			"content": content,
+			"encode":  "0",
+		},
+		nil)
 }
 
 func (v *VirtualMachine) WaitForAgentExecExit(ctx context.Context, pid, seconds int) (*AgentExecStatus, error) {

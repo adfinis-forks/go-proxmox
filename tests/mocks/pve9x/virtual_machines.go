@@ -825,4 +825,13 @@ func virtualMachines() {
 		JSON(`{
     "data": "UPID:node1:0000000F:0000000F:0000000F:qmdelsnapshot:100:root@pam:"
 }`)
+
+	// POST /nodes/{node}/qemu/{vmid}/agent/file-read - Read from a file
+	gock.New(config.C.URI).
+		Get("^/nodes/node1/qemu/100/agent/file-read$").
+		Reply(200).
+		JSON(`{
+    "content": "Mock File Content",
+    "truncated": false
+}`)
 }

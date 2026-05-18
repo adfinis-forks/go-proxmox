@@ -2106,3 +2106,8 @@ type SDNZoneOptions struct {
 	VRFVXLAN                 int    `json:"vrf-vxlan,omitempty"`
 	VXLANPort                uint16 `json:"vxlan-port,omitempty"`
 }
+
+type AgentFileRead struct {
+	Content   []byte    `json:"content"`
+	Truncated IntOrBool `json:"truncated,omitempty"`
+}
